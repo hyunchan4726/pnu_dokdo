@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 핵심 용어 사전: 인터랙티브 탐색기</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: East Sea Blue (Warm Neutral Background with Deep Blue Accents) -->
+    <!-- Application Structure Plan: 
+         1. Dashboard Layout: The app is structured as a "Knowledge Dashboard" rather than a linear document.
+         2. Hero Section: Sets the tone and context.
+         3. Dynamic Navigation: Allows users to filter content by category (Geography, History, Law, etc.), transforming a long list into manageable chunks.
+         4. Three Core Views:
+            - 'Card Grid': The default exploratory view for all terms.
+            - 'Timeline View': Automatically extracts chronological events (1667-2005) mentioned in the text for a historical perspective.
+            - 'Data Analysis': Visualizes the numerical data found in the report (Distances, EEZ) to provide scale context.
+         5. Interaction: Search bar, category filters, and tab switching drive the content display.
+         6. Justification: This structure allows users to jump between "what is it?" (Definitions), "when did it happen?" (History), and "how big is it?" (Data), covering all aspects of the report.
+    -->
+    <!-- Visualization & Content Choices:
+         1. Geography & Law -> Goal: Inform -> Method: Concept Cards with Icons -> Interaction: Hover effects, Filtering -> Justification: Easy scanning of distinct terms.
+         2. Historical Dates (1667, 1905, etc.) -> Goal: Organize -> Method: Vertical Timeline (HTML/CSS) -> Interaction: Scroll -> Justification: Shows the progression of events mentioned in the report clearly.
+         3. Numerical Distances (12nm, 200nm, 87.4km) -> Goal: Compare -> Method: Horizontal Bar Chart (Chart.js) -> Interaction: Tooltips -> Justification: Visualizes the vast difference between Territorial Sea, Physical Distance, and EEZ described in the text.
+         4. Confirmation: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .term-card {
+            transition: all 0.3s ease;
+        }
+        .term-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <!-- Header Section -->
+    <header class="bg-blue-900 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4 md:gap-0">
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-center md:justify-start">
+                <span class="text-3xl">🇰🇷</span>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold tracking-tight">독도 핵심 용어 사전</h1>
+                    <p class="text-blue-200 text-xs md:text-sm">Dokdo Terminology & History Explorer</p>
+                </div>
+            </div>
+            
+            <!-- Right Side: Search + Home -->
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <!-- Global Search -->
+                <div class="relative flex-grow md:w-64">
+                    <input type="text" id="searchInput" placeholder="용어 검색..." class="w-full px-4 py-2 rounded-full text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm">
+                    <span class="absolute right-3 top-2.5 text-slate-400 text-xs">🔍</span>
+                </div>
+
+                <!-- Home Icon -->
+                <a href="index.html" class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-800 hover:bg-blue-700 transition text-white shadow-sm flex-shrink-0" title="홈으로 이동">
+                    <span class="text-lg">🏠</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Intro Context -->
+        <section class="mb-10 text-center max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold text-slate-800 mb-3">대한민국 독도 지식 아카이브</h2>
+            <p class="text-slate-600 leading-relaxed">
+                이 인터랙티브 사전은 독도의 지리, 행정, 국제법적 지위, 역사적 기록 및 관련 인물에 대한 핵심 정보를 제공합니다. 
+                아래 탭을 사용하여 용어를 탐색하거나, 연표를 통해 역사를 확인하고, 시각화된 데이터를 통해 독도의 위치적 중요성을 이해해보세요.
+            </p>
+        </section>
+
+        <!-- Navigation Tabs -->
+        <div class="flex flex-wrap justify-center mb-8 gap-2" id="viewTabs">
+            <button onclick="switchView('cards')" class="view-tab active px-6 py-2 rounded-full bg-blue-600 text-white font-medium hover:bg-blue-700 transition shadow-sm" data-view="cards">📚 용어 카드 (전체)</button>
+            <button onclick="switchView('timeline')" class="view-tab px-6 py-2 rounded-full bg-white text-slate-600 font-medium hover:bg-slate-100 border border-slate-200 transition shadow-sm" data-view="timeline">⏳ 역사 연표</button>
+            <button onclick="switchView('data')" class="view-tab px-6 py-2 rounded-full bg-white text-slate-600 font-medium hover:bg-slate-100 border border-slate-200 transition shadow-sm" data-view="data">📊 거리 및 데이터</button>
+        </div>
+
+        <!-- Filter Buttons (Only visible in Cards View) -->
+        <div id="filterContainer" class="flex flex-wrap justify-center gap-2 mb-8 animate-fade-in">
+            <button onclick="filterCards('all')" class="filter-btn active px-3 py-1 text-sm rounded-md bg-slate-200 text-slate-700 hover:bg-slate-300 font-medium" data-category="all">전체 보기</button>
+            <button onclick="filterCards('지리 및 행정')" class="filter-btn px-3 py-1 text-sm rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-category="지리 및 행정">🗺️ 지리/행정</button>
+            <button onclick="filterCards('해양법 및 조약')" class="filter-btn px-3 py-1 text-sm rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-category="해양법 및 조약">⚖️ 해양법/조약</button>
+            <button onclick="filterCards('역사적 명칭')" class="filter-btn px-3 py-1 text-sm rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-category="역사적 명칭">🏷️ 역사적 명칭</button>
+            <button onclick="filterCards('주요 문헌')" class="filter-btn px-3 py-1 text-sm rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-category="주요 문헌">📜 주요 문헌</button>
+            <button onclick="filterCards('인물 및 단체')" class="filter-btn px-3 py-1 text-sm rounded-md bg-white border border-slate-200 text-slate-600 hover:bg-slate-50" data-category="인물 및 단체">👥 인물/단체</button>
+        </div>
+
+        <!-- VIEW 1: Cards Grid -->
+        <div id="cardsView" class="view-section block">
+            <div id="cardsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Cards will be injected here via JS -->
+            </div>
+            <div id="noResults" class="hidden text-center py-12 text-slate-500">
+                <p class="text-lg">검색 결과가 없습니다.</p>
+            </div>
+        </div>
+
+        <!-- VIEW 2: Timeline -->
+        <div id="timelineView" class="view-section hidden">
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-slate-100">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 border-b pb-2">📅 독도 역사 주요 연표</h3>
+                <p class="text-sm text-slate-500 mb-8">문헌 기록, 조약 체결, 주요 사건 발생 연도를 중심으로 정리된 역사적 흐름입니다.</p>
+                <div class="relative border-l-2 border-blue-200 ml-3 space-y-10" id="timelineContainer">
+                    <!-- Timeline items injected via JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: Data Analysis -->
+        <div id="dataView" class="view-section hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Text Context -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4">🌊 해양 영역과 거리의 이해</h3>
+                    <p class="text-slate-600 mb-4 leading-relaxed">
+                        독도는 단순한 섬이 아니라 대한민국의 <strong>영해</strong>와 <strong>배타적 경제수역(EEZ)</strong>을 결정짓는 중요한 기점입니다.
+                        보고서에 언급된 수치를 바탕으로 물리적 거리와 법적 권리 수역의 크기를 비교합니다.
+                    </p>
+                    <ul class="space-y-3 mt-6">
+                        <li class="flex items-start">
+                            <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded mt-1 mr-2">영해 (12해리)</span>
+                            <span class="text-sm text-slate-600">국가의 절대적 주권이 미치는 바다. 약 22km 범위입니다.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded mt-1 mr-2">거리 (87.4km)</span>
+                            <span class="text-sm text-slate-600">울릉도에서 독도까지의 거리입니다. 육안으로 관측 가능하며 지리적, 역사적 연계성을 보여줍니다.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-2 py-1 rounded mt-1 mr-2">EEZ (200해리)</span>
+                            <span class="text-sm text-slate-600">자원 탐사 및 개발 권리가 있는 수역으로, 약 370km에 달하는 광범위한 영역입니다.</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Chart Container -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col justify-center">
+                    <h4 class="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wider text-center">거리 및 수역 범위 비교 (km)</h4>
+                    <div class="chart-container">
+                        <canvas id="distanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-500 text-sm">© 2024 Dokdo Interactive Report. Based on provided source material.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- 1. Data Store (Parsed from Markdown Source) ---
+        const termData = [
+            // 1. 지리 및 행정
+            { category: "지리 및 행정", term: "독도 (Dokdo)", desc: "동도와 서도 및 89개의 바위섬으로 구성된 화산섬. 울릉도 동남쪽 87.4km 거리에 위치함.", icon: "🏝️" },
+            { category: "지리 및 행정", term: "독도리 (Dokdo-ri)", desc: "독도의 행정 구역 명칭. 도로명 주소로 동도는 '이사부길', 서도는 '안용복길'을 사용함.", icon: "📮" },
+            { category: "지리 및 행정", term: "해산 (Seamounts)", desc: "독도 주변 해저의 산(안용복해산, 심흥택해산, 이사부해산 등). 울릉도와 독도가 지질적으로 연결되어 있음을 증명함.", icon: "⛰️" },
+            // 2. 해양법 및 조약
+            { category: "해양법 및 조약", term: "배타적 경제수역 (EEZ)", desc: "영해 기선에서 200해리(약 370km)까지의 수역. 연안국이 자원 탐사 및 개발 권리를 가짐.", icon: "⚓", value: 370 },
+            { category: "해양법 및 조약", term: "영해 (Territorial Sea)", desc: "국가의 주권이 미치는 바다. 통상 기선(해안선)으로부터 12해리(약 22km)까지의 범위.", icon: "🌊", value: 22 },
+            { category: "해양법 및 조약", term: "평화선 (이승만 라인)", desc: "1952년 한국 정부가 선포한 주권 선언. 독도를 포함한 인근 수역을 한국 관할로 명확히 함.", year: 1952, icon: "🚧" },
+            { category: "해양법 및 조약", term: "신한일 어업협정", desc: "1998년 체결된 어업협정. 독도가 '한일 중간수역'에 포함되면서 영유권 및 어업권 논란의 불씨가 됨.", year: 1998, icon: "🤝" },
+            { category: "해양법 및 조약", term: "SCAPIN 제677호", desc: "1946년 연합군최고사령관 지령. 독도를 일본의 통치권에서 제외하고 한국 영토로 분류한 명령서.", year: 1946, icon: "📄" },
+            { category: "해양법 및 조약", term: "샌프란시스코 강화조약", desc: "1951년 연합국과 일본이 맺은 조약. 독도가 반환 목록에서 명시적으로 빠졌으나, 초기 초안에는 한국 영토로 명시됨.", year: 1951, icon: "✍️" },
+            // 3. 역사적 명칭
+            { category: "역사적 명칭", term: "우산도 (Usando)", desc: "삼국시대 우산국에서 유래한 독도의 옛 명칭. 『세종실록지리지』 등에 기록됨.", icon: "🏷️" },
+            { category: "역사적 명칭", term: "석도 (Seokdo)", desc: "'돌섬'을 한자로 표기한 명칭. 1900년 대한제국 칙령 제41호에서 울릉군 관할 구역으로 명시됨.", year: 1900, icon: "🪨" },
+            { category: "역사적 명칭", term: "송도 (Matsushima)", desc: "과거 일본이 독도를 부르던 명칭. 1905년 이후 일본은 독도를 '다케시마'로 부르기 시작함.", year: 1905, icon: "🇯🇵" },
+            { category: "역사적 명칭", term: "리앙쿠르 암 (Liancourt Rocks)", desc: "1849년 프랑스 포경선 리앙쿠르호가 독도를 발견하고 붙인 서양식 명칭.", year: 1849, icon: "🇫🇷" },
+            // 4. 주요 문헌
+            { category: "주요 문헌", term: "은주시청합기", desc: "1667년 일본 돗토리번의 보고서. 일본의 서쪽 경계를 오키섬으로 규정하여 독도와 울릉도가 조선 땅임을 시사함.", year: 1667, icon: "📜" },
+            { category: "주요 문헌", term: "태정관 지령", desc: "1877년 일본 메이지 정부 최고 기관인 태정관이 '울릉도와 독도는 일본과 관계없다'고 내무성에 내린 지시문.", year: 1877, icon: "🏛️" },
+            { category: "주요 문헌", term: "시마네현 고시 제40호", desc: "1905년 일본이 독도를 다케시마로 개칭하고 시마네현에 강제 편입시킨 지방 정부 고시.", year: 1905, icon: "🚫" },
+            // 5. 인물 및 단체
+            { category: "인물 및 단체", term: "안용복", desc: "조선 숙종 때의 어부. 1693년, 1696년 일본으로 건너가 울릉도/독도가 조선 땅임을 주장하고 에도 막부의 인정을 받아냄.", year: 1693, icon: "👤" },
+            { category: "인물 및 단체", term: "독도의용수비대", desc: "1950년대 일본의 불법 침입에 맞서 민간인들이 자발적으로 조직하여 독도를 지킨 단체.", icon: "🛡️" },
+            { category: "인물 및 단체", term: "최종덕", desc: "1965년부터 독도에 거주하다가 1981년 주민등록을 이전하여 독도의 최초 주민이 된 인물.", year: 1965, icon: "🏠" },
+            // 6. 기타
+            { category: "기타", term: "가스 하이드레이트", desc: "독도 인근 심해저에 매장된 고체 상태의 천연가스. '불타는 얼음'이라 불리는 차세대 에너지원.", icon: "🔥" },
+            { category: "기타", term: "다케시마의 날", desc: "2005년 일본 시마네현이 1905년의 강제 편입을 기념해 매년 2월 22일로 제정한 날.", year: 2005, icon: "🗓️" }
+        ];
+
+        // --- 2. State Management ---
+        let currentView = 'cards';
+        let currentFilter = 'all';
+        let searchTerm = '';
+
+        // --- 3. DOM Elements ---
+        const cardsGrid = document.getElementById('cardsGrid');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const viewTabs = document.querySelectorAll('.view-tab');
+        const searchInput = document.getElementById('searchInput');
+        const noResults = document.getElementById('noResults');
+
+        // --- 4. Render Logic ---
+
+        // Render Cards
+        function renderCards() {
+            cardsGrid.innerHTML = '';
+            
+            const filteredData = termData.filter(item => {
+                const matchesFilter = currentFilter === 'all' || item.category === currentFilter;
+                const matchesSearch = item.term.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                                      item.desc.toLowerCase().includes(searchTerm.toLowerCase());
+                return matchesFilter && matchesSearch;
+            });
+
+            if (filteredData.length === 0) {
+                noResults.classList.remove('hidden');
+            } else {
+                noResults.classList.add('hidden');
+                filteredData.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'term-card bg-white p-6 rounded-xl shadow-sm border border-slate-100 flex flex-col h-full';
+                    
+                    // Category Badge Color
+                    let badgeColor = "bg-slate-100 text-slate-600";
+                    if(item.category.includes("지리")) badgeColor = "bg-green-100 text-green-700";
+                    if(item.category.includes("해양법")) badgeColor = "bg-blue-100 text-blue-700";
+                    if(item.category.includes("역사")) badgeColor = "bg-amber-100 text-amber-700";
+                    if(item.category.includes("문헌")) badgeColor = "bg-stone-100 text-stone-700";
+                    if(item.category.includes("인물")) badgeColor = "bg-purple-100 text-purple-700";
+
+                    card.innerHTML = `
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="text-3xl">${item.icon}</span>
+                            <span class="text-xs font-semibold px-2 py-1 rounded ${badgeColor}">${item.category}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-slate-800 mb-2">${item.term}</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed flex-grow">${item.desc}</p>
+                    `;
+                    cardsGrid.appendChild(card);
+                });
+            }
+        }
+
+        // Render Timeline
+        function renderTimeline() {
+            timelineContainer.innerHTML = '';
+            
+            // Filter items with years and sort
+            const historyItems = termData
+                .filter(item => item.year)
+                .sort((a, b) => a.year - b.year);
+
+            historyItems.forEach(item => {
+                const node = document.createElement('div');
+                node.className = 'mb-8 relative pl-6';
+                node.innerHTML = `
+                    <div class="absolute -left-[21px] top-1 w-4 h-4 rounded-full bg-blue-500 border-4 border-blue-100"></div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-slate-100 hover:shadow-md transition">
+                        <span class="inline-block px-2 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded mb-1">${item.year}년</span>
+                        <h4 class="font-bold text-slate-800">${item.term}</h4>
+                        <p class="text-sm text-slate-600 mt-1">${item.desc}</p>
+                    </div>
+                `;
+                timelineContainer.appendChild(node);
+            });
+        }
+
+        // Render Chart
+        let distanceChart = null;
+
+        function renderChart() {
+            if (distanceChart) return; // Already rendered
+
+            const ctx = document.getElementById('distanceChart').getContext('2d');
+            
+            distanceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['영해 (12해리)', '울릉도-독도 거리', 'EEZ (200해리)'],
+                    datasets: [{
+                        label: '거리 (km)',
+                        data: [22, 87.4, 370],
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.7)', // Blue
+                            'rgba(16, 185, 129, 0.7)', // Green
+                            'rgba(99, 102, 241, 0.7)'  // Indigo
+                        ],
+                        borderColor: [
+                            'rgb(59, 130, 246)',
+                            'rgb(16, 185, 129)',
+                            'rgb(99, 102, 241)'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Horizontal bar chart
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.x + ' km';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            grid: { color: '#f1f5f9' },
+                            title: { display: true, text: '거리 (km)' }
+                        },
+                        y: {
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // --- 5. Event Listeners ---
+
+        // View Switching
+        window.switchView = (viewName) => {
+            currentView = viewName;
+            
+            // Update Tab UI
+            viewTabs.forEach(tab => {
+                if (tab.dataset.view === viewName) {
+                    tab.classList.remove('bg-white', 'text-slate-600', 'hover:bg-slate-100', 'border', 'border-slate-200');
+                    tab.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                } else {
+                    tab.classList.add('bg-white', 'text-slate-600', 'hover:bg-slate-100', 'border', 'border-slate-200');
+                    tab.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                }
+            });
+
+            // Toggle Sections
+            document.getElementById('cardsView').classList.add('hidden');
+            document.getElementById('timelineView').classList.add('hidden');
+            document.getElementById('dataView').classList.add('hidden');
+            document.getElementById('filterContainer').classList.add('hidden');
+
+            if (viewName === 'cards') {
+                document.getElementById('cardsView').classList.remove('hidden');
+                document.getElementById('filterContainer').classList.remove('hidden');
+                renderCards();
+            } else if (viewName === 'timeline') {
+                document.getElementById('timelineView').classList.remove('hidden');
+                renderTimeline();
+            } else if (viewName === 'data') {
+                document.getElementById('dataView').classList.remove('hidden');
+                // Small delay to ensure container size is calculated
+                setTimeout(renderChart, 50);
+            }
+        };
+
+        // Filtering
+        window.filterCards = (category) => {
+            currentFilter = category;
+            
+            // Update Filter UI
+            filterBtns.forEach(btn => {
+                if (btn.dataset.category === category) {
+                    btn.classList.add('active', 'bg-slate-200', 'text-slate-700');
+                    btn.classList.remove('bg-white', 'border', 'text-slate-600');
+                } else {
+                    btn.classList.remove('active', 'bg-slate-200', 'text-slate-700');
+                    btn.classList.add('bg-white', 'border', 'text-slate-600');
+                }
+            });
+            
+            renderCards();
+        };
+
+        // Searching
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            if (currentView !== 'cards') {
+                switchView('cards');
+            } else {
+                renderCards();
+            }
+        });
+
+        // Initial Render
+        renderCards();
+
+    </script>
+</body>
+</html>
