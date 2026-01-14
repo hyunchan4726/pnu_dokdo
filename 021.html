@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>독도 역사 연표</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom scrollbar hiding for horizontal scroll */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-blue-700 to-cyan-600 text-white shadow-lg sticky top-0 z-50">
+            <div class="max-w-4xl mx-auto px-4 py-6">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold flex items-center gap-2">
+                            <i data-lucide="map" class="w-8 h-8"></i>
+                            독도 역사 연표
+                        </h1>
+                        <p class="text-blue-100 mt-1 text-sm md:text-base">
+                            역사적 사실과 문헌으로 보는 우리 땅 독도의 역사
+                        </p>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <div class="relative w-full md:w-64">
+                        <input
+                            type="text"
+                            id="searchInput"
+                            placeholder="연도, 사건 검색..."
+                            class="w-full pl-10 pr-4 py-2 rounded-full text-slate-800 focus:outline-none focus:ring-2 focus:ring-blue-300 shadow-md"
+                        />
+                        <i data-lucide="search" class="absolute left-3 top-2.5 text-gray-400 w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 py-8 flex-grow w-full">
+            <!-- Filters -->
+            <div class="mb-8 overflow-x-auto pb-2 scrollbar-hide">
+                <div id="filterContainer" class="flex gap-2 min-w-max">
+                    <!-- Filter buttons will be injected here -->
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="relative">
+                <!-- Vertical Line -->
+                <div class="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gray-200 transform -translate-x-1/2 md:translate-x-0"></div>
+                
+                <!-- Timeline Items Container -->
+                <div id="timelineContainer" class="space-y-8">
+                    <!-- Timeline items will be injected here -->
+                </div>
+
+                <!-- Empty State -->
+                <div id="emptyState" class="hidden text-center py-20">
+                    <div class="bg-white p-6 rounded-xl shadow-sm inline-block">
+                        <i data-lucide="search" class="w-12 h-12 text-gray-300 mx-auto mb-3"></i>
+                        <p class="text-gray-500">검색 결과가 없습니다.</p>
+                        <button id="resetButton" class="mt-2 text-blue-500 hover:underline text-sm">
+                            필터 초기화
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-slate-800 text-slate-400 py-8 mt-12">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <div class="flex justify-center items-center gap-2 mb-4">
+                    <i data-lucide="map" class="w-5 h-5 text-blue-400"></i>
+                    <span class="text-white font-semibold">Dokdo History</span>
+                </div>
+                <p class="text-sm">
+                    대한민국의 아름다운 영토, 독도의 역사를 기억합니다.<br/>
+                    제공된 연표 자료를 바탕으로 제작되었습니다.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // --- Data ---
+        // React component icons are replaced with string names for Lucide
+        const timelineData = [
+            {
+                id: 1,
+                year: '460~250만년 전',
+                title: '독도 형성',
+                description: '화산활동으로 생성된 화산섬으로 울릉도보다 생성 시기가 앞섭니다.',
+                source: '지질학적 기원',
+                category: 'science',
+                iconName: 'map'
+            },
+            {
+                id: 2,
+                year: '1454년',
+                title: '세종실록지리지',
+                description: '우산(독도)과 무릉(울릉도)이 울진현 정동쪽 바다에 있다고 기록했습니다. 날씨가 맑으면 서로 볼 수 있다고 명시되어 있습니다.',
+                source: '세종실록지리지',
+                category: 'korea_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 3,
+                year: '1481년',
+                title: '팔도총도',
+                description: '동해상에 울릉도와 우산도(독도) 두 섬을 표기하였습니다.',
+                source: '동국여지승람',
+                category: 'korea_record',
+                iconName: 'map'
+            },
+            {
+                id: 4,
+                year: '1531년',
+                title: '신증동국여지승람',
+                description: '우산도와 울릉도가 고을 바로 동쪽 바다 가운데 있다고 기록하였습니다.',
+                source: '신증동국여지승람',
+                category: 'korea_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 5,
+                year: '1667년',
+                title: '은주시청합기',
+                description: '일본 오키섬을 일본의 서쪽 경계로 삼아 독도와 울릉도가 조선 땅임을 시사하였습니다.',
+                source: '은주시청합기 (일본)',
+                category: 'japan_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 6,
+                year: '1693년',
+                title: '1차 안용복 사건',
+                description: '안용복이 일본으로 납치되어 울릉도와 독도가 조선 땅임을 강력히 주장하고 귀국하였습니다.',
+                source: '숙종실록',
+                category: 'event',
+                iconName: 'flag'
+            },
+            {
+                id: 7,
+                year: '1695년',
+                title: '돗토리번 답변서',
+                description: '일본 돗토리번이 막부에 울릉도와 독도가 돗토리번 소속이 아님을 공식적으로 답변했습니다.',
+                source: '돗토리번 답변서 (일본)',
+                category: 'japan_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 8,
+                year: '1696년',
+                title: '2차 안용복 사건 & 도해금지령',
+                description: '안용복이 일본 호키주로 가서 조선 영토임을 주장했습니다. 이에 일본 막부가 울릉도 도해 금지령을 내렸습니다.',
+                source: '숙종실록 / 일본 막부 문서',
+                category: 'event',
+                iconName: 'flag'
+            },
+            {
+                id: 9,
+                year: '1696년',
+                title: '조선주착안 일권지각서',
+                description: '안용복 취조 보고서 첨부 지도에 울릉도와 독도가 조선 강원도 소속으로 기록되었습니다.',
+                source: '조선주착안 일권지각서 (일본)',
+                category: 'japan_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 10,
+                year: '1697년',
+                title: '수토관 제도 시행',
+                description: '조선 정부가 울릉도와 주변 섬에 관리를 파견하여 관리를 시작했습니다 (1894년까지 지속).',
+                source: '조선 정부 정책',
+                category: 'korea_record',
+                iconName: 'shield'
+            },
+            {
+                id: 11,
+                year: '1779년',
+                title: '개정 일본여지로정전도',
+                description: '울릉도와 독도가 채색되지 않은 상태로 일본 영역 밖의 섬으로 그려졌습니다.',
+                source: '개정 일본여지로정전도 (일본)',
+                category: 'japan_record',
+                iconName: 'map'
+            },
+            {
+                id: 12,
+                year: '1785년',
+                title: '삼국접양지도',
+                description: '울릉도와 독도를 조선과 같은 황색으로 칠하고 \'조선의 것\'이라고 명기했습니다.',
+                source: '삼국접양지도 (일본)',
+                category: 'japan_record',
+                iconName: 'map'
+            },
+            {
+                id: 13,
+                year: '1800년대',
+                title: '서양의 독도 발견',
+                description: '프랑스(리앙쿠르), 러시아, 영국 등이 독도를 발견하고 이름을 붙였습니다.',
+                source: '서양 지도 및 항해일지',
+                category: 'international',
+                iconName: 'map'
+            },
+            {
+                id: 14,
+                year: '1808년',
+                title: '만기요람',
+                description: '\'우산은 왜인들이 말하는 송도\'라고 기록하며 우산국(조선)의 땅임을 명시했습니다.',
+                source: '만기요람',
+                category: 'korea_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 15,
+                year: '1877년',
+                title: '태정관 지령',
+                description: '일본 최고 행정기관인 태정관이 "울릉도와 독도는 일본과 관계없음"을 명시한 중요한 문서입니다.',
+                source: '태정관 지령 (일본)',
+                category: 'japan_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 16,
+                year: '1900년',
+                title: '대한제국 칙령 제41호',
+                description: '울릉도를 울도로 개칭하고 독도(석도)를 관할 구역으로 명시했습니다. (독도의 날 유래)',
+                source: '관보',
+                category: 'korea_record',
+                iconName: 'shield'
+            },
+            {
+                id: 17,
+                year: '1905년',
+                title: '시마네현 고시 제40호',
+                description: '러일전쟁 중 일본이 독도를 다케시마로 개칭하고 시마네현에 강제 편입을 시도했습니다.',
+                source: '시마네현 고시 (일본)',
+                category: 'japan_record',
+                iconName: 'info'
+            },
+            {
+                id: 18,
+                year: '1906년',
+                title: '강원도 관찰사 보고',
+                description: '울릉군수 심흥택이 일본의 독도 편입 주장을 보고하자, 의정부가 지령 3호를 통해 이를 부정했습니다.',
+                source: '강원도 관찰사 보고서',
+                category: 'korea_record',
+                iconName: 'book-open'
+            },
+            {
+                id: 19,
+                year: '1946년',
+                title: 'SCAPIN 제677호',
+                description: '연합군최고사령관 지령으로 독도를 일본의 통치권에서 제외하고 한국 영토로 표시했습니다.',
+                source: '연합군 최고사령부',
+                category: 'international',
+                iconName: 'shield'
+            },
+            {
+                id: 20,
+                year: '1951년',
+                title: '샌프란시스코 강화조약',
+                description: '일본의 로비로 독도 명칭이 최종 조약문에서 빠졌으나, 한국 영토 포기 조항이 포함되었습니다.',
+                source: '국제 조약',
+                category: 'international',
+                iconName: 'info'
+            },
+            {
+                id: 21,
+                year: '1953년',
+                title: '독도의용수비대 활동',
+                description: '민간인들이 자발적으로 조직하여 독도 경비를 시작했습니다. (이후 독도경비대로 발전)',
+                source: '독도의용수비대',
+                category: 'event',
+                iconName: 'shield'
+            },
+            {
+                id: 22,
+                year: '1965년',
+                title: '한일기본조약',
+                description: '한일 국교 정상화가 이루어졌으나 독도 문제에 대한 명시적 해결은 미뤄졌습니다.',
+                source: '한일기본조약',
+                category: 'international',
+                iconName: 'info'
+            },
+            {
+                id: 23,
+                year: '2005년',
+                title: '다케시마의 날 제정',
+                description: '일본 시마네현 의회가 2월 22일을 다케시마의 날로 제정하는 조례를 통과시켰습니다.',
+                source: '일본 시마네현 조례',
+                category: 'event',
+                iconName: 'info'
+            },
+            {
+                id: 24,
+                year: '2012년',
+                title: '이명박 대통령 독도 방문',
+                description: '대한민국 헌정 사상 최초로 현직 대통령이 독도를 방문했습니다.',
+                source: '언론 보도',
+                category: 'event',
+                iconName: 'flag'
+            }
+        ];
+
+        const categories = [
+            { id: 'all', label: '전체 보기', colorClass: 'bg-gray-100 text-gray-800', activeClass: 'bg-gray-200 text-gray-800' },
+            { id: 'korea_record', label: '한국 문헌/기록', colorClass: 'bg-blue-100 text-blue-800', activeClass: 'bg-blue-200 text-blue-800' },
+            { id: 'japan_record', label: '일본 문헌/기록', colorClass: 'bg-red-100 text-red-800', activeClass: 'bg-red-200 text-red-800' },
+            { id: 'international', label: '국제/서양', colorClass: 'bg-purple-100 text-purple-800', activeClass: 'bg-purple-200 text-purple-800' },
+            { id: 'event', label: '주요 사건', colorClass: 'bg-green-100 text-green-800', activeClass: 'bg-green-200 text-green-800' },
+            { id: 'science', label: '지리/과학', colorClass: 'bg-yellow-100 text-yellow-800', activeClass: 'bg-yellow-200 text-yellow-800' }
+        ];
+
+        const categoryBorderColors = {
+            'korea_record': 'border-blue-500',
+            'japan_record': 'border-red-500',
+            'international': 'border-purple-500',
+            'event': 'border-green-500',
+            'science': 'border-yellow-500',
+            'default': 'border-gray-500'
+        };
+
+        // --- State ---
+        let state = {
+            searchTerm: '',
+            selectedCategory: 'all',
+            activeId: null
+        };
+
+        // --- DOM Elements ---
+        const searchInput = document.getElementById('searchInput');
+        const filterContainer = document.getElementById('filterContainer');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const emptyState = document.getElementById('emptyState');
+        const resetButton = document.getElementById('resetButton');
+
+        // --- Initialize ---
+        function init() {
+            renderFilters();
+            renderTimeline();
+            setupEventListeners();
+            lucide.createIcons();
+        }
+
+        function setupEventListeners() {
+            searchInput.addEventListener('input', (e) => {
+                state.searchTerm = e.target.value;
+                state.activeId = null; // Reset active state on search
+                renderTimeline();
+            });
+
+            resetButton.addEventListener('click', () => {
+                state.searchTerm = '';
+                state.selectedCategory = 'all';
+                state.activeId = null;
+                searchInput.value = '';
+                renderFilters();
+                renderTimeline();
+            });
+        }
+
+        // --- Render Functions ---
+
+        function renderFilters() {
+            filterContainer.innerHTML = categories.map(cat => {
+                const isActive = state.selectedCategory === cat.id;
+                const baseClasses = "px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 whitespace-nowrap";
+                const activeClasses = isActive 
+                    ? `ring-2 ring-offset-2 ring-blue-500 shadow-md transform scale-105 ${cat.activeClass}` 
+                    : `bg-white text-slate-600 hover:bg-gray-50 border border-gray-200`;
+                
+                return `
+                    <button 
+                        onclick="handleCategoryClick('${cat.id}')"
+                        class="${baseClasses} ${activeClasses}"
+                    >
+                        ${cat.label}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderTimeline() {
+            const filteredData = timelineData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(state.searchTerm.toLowerCase()) || 
+                                      item.year.includes(state.searchTerm) ||
+                                      item.description.includes(state.searchTerm);
+                const matchesCategory = state.selectedCategory === 'all' || item.category === state.selectedCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filteredData.length === 0) {
+                timelineContainer.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                
+                timelineContainer.innerHTML = filteredData.map((item, index) => {
+                    const isLeft = index % 2 === 0;
+                    const isSelected = state.activeId === item.id;
+                    const borderColor = categoryBorderColors[item.category] || categoryBorderColors['default'];
+                    const categoryLabel = categories.find(c => c.id === item.category)?.label || '';
+
+                    return `
+                        <div 
+                            class="relative flex items-center md:justify-between ${isLeft ? 'md:flex-row-reverse' : ''}"
+                            onclick="handleItemClick(${item.id})"
+                        >
+                            <!-- Spacer for Desktop -->
+                            <div class="hidden md:block w-5/12"></div>
+
+                            <!-- Timeline Dot -->
+                            <div class="absolute left-4 md:left-1/2 w-8 h-8 rounded-full bg-white border-4 border-blue-500 flex items-center justify-center transform -translate-x-1/2 md:translate-x-0.5 z-10 shadow-sm">
+                                <i data-lucide="${item.iconName}" class="w-5 h-5"></i>
+                            </div>
+
+                            <!-- Content Card -->
+                            <div class="ml-12 md:ml-0 w-full md:w-5/12 transform transition-all duration-300 hover:scale-102 cursor-pointer ${isSelected ? 'scale-105' : ''}">
+                                <div class="bg-white p-5 rounded-lg shadow-md border-l-4 hover:shadow-lg transition-shadow ${borderColor}">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="inline-block px-2 py-1 bg-slate-100 text-slate-600 text-xs font-bold rounded">
+                                            ${item.year}
+                                        </span>
+                                        <span class="text-xs text-gray-400 text-right w-1/2">${item.source}</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold text-slate-800 mb-2">${item.title}</h3>
+                                    <p class="text-slate-600 text-sm leading-relaxed ${isSelected ? '' : 'line-clamp-2 md:line-clamp-none'}">
+                                        ${item.description}
+                                    </p>
+                                    
+                                    ${isSelected ? `
+                                        <div class="mt-3 pt-3 border-t border-gray-100 animate-fadeIn">
+                                            <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded">
+                                                ${categoryLabel}
+                                            </span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            // Re-initialize icons for newly added elements
+            lucide.createIcons();
+        }
+
+        // --- Event Handlers (Exposed to Global Scope) ---
+
+        window.handleCategoryClick = (categoryId) => {
+            state.selectedCategory = categoryId;
+            renderFilters();
+            renderTimeline();
+        };
+
+        window.handleItemClick = (itemId) => {
+            // Toggle active state
+            state.activeId = state.activeId === itemId ? null : itemId;
+            renderTimeline();
+        };
+
+        // Start App
+        init();
+    </script>
+</body>
+</html>
