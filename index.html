@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대한민국 독도 지식 아카이브</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+        }
+        .nav-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .nav-card:hover .arrow-icon {
+            transform: translateX(4px);
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <!-- Hero Section -->
+    <div class="bg-blue-900 text-white relative overflow-hidden flex-shrink-0">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 opacity-95"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+            <div class="mb-6 animate-fade-in-up">
+                <span class="inline-block p-3 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-3xl">🇰🇷</span>
+            </div>
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight">
+                대한민국 <span class="text-blue-200">독도</span> 지식 아카이브
+            </h1>
+            <p class="text-lg md:text-xl text-blue-100 max-w-2xl mb-10 font-light leading-relaxed">
+                역사적 진실과 국제법적 근거를 바탕으로<br class="hidden md:block"/>
+                우리의 소중한 영토, 독도에 대한 올바른 정보를 제공합니다.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Navigation Grid -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-10 pb-20 w-full">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+            
+            <!-- 01. 정책 (Policy) -->
+            <a href="01.html" class="nav-card group bg-white rounded-2xl shadow-lg border border-slate-100 p-8 flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                            📜
+                        </div>
+                        <span class="text-4xl font-bold text-slate-100 group-hover:text-blue-50 transition-colors">01</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-blue-700 transition-colors">독도 정책</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        대한민국 정부의 독도에 대한 기본 입장과 외교 정책, 그리고 독도 관리 현황을 확인하실 수 있습니다.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-blue-600 font-semibold group-hover:text-blue-700">
+                    정책 살펴보기 
+                    <svg class="arrow-icon w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- 02. 연표 (Timeline) -->
+            <a href="02.html" class="nav-card group bg-white rounded-2xl shadow-lg border border-slate-100 p-8 flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+                            ⏳
+                        </div>
+                        <span class="text-4xl font-bold text-slate-100 group-hover:text-amber-50 transition-colors">02</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-amber-600 transition-colors">역사 연표</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        삼국시대부터 현재까지 독도와 관련된 주요 역사적 사건과 문헌 기록을 연대순으로 정리했습니다.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-amber-600 font-semibold group-hover:text-amber-700">
+                    역사 흐름 보기 
+                    <svg class="arrow-icon w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- 03. 용어 (Terminology) -->
+            <a href="03.html" class="nav-card group bg-white rounded-2xl shadow-lg border border-slate-100 p-8 flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:bg-green-600 group-hover:text-white transition-colors duration-300">
+                            📚
+                        </div>
+                        <span class="text-4xl font-bold text-slate-100 group-hover:text-green-50 transition-colors">03</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-green-700 transition-colors">핵심 용어 사전</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        지리, 행정, 국제법 등 독도를 이해하는 데 필수적인 핵심 용어와 관련 데이터를 쉽게 찾아볼 수 있습니다.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-green-600 font-semibold group-hover:text-green-700">
+                    용어 검색하기 
+                    <svg class="arrow-icon w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+            <!-- 04. 의견수렴 (Opinion) -->
+            <a href="04.html" class="nav-card group bg-white rounded-2xl shadow-lg border border-slate-100 p-8 flex flex-col justify-between h-full">
+                <div>
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-3xl shadow-sm group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                            💬
+                        </div>
+                        <span class="text-4xl font-bold text-slate-100 group-hover:text-purple-50 transition-colors">04</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800 mb-3 group-hover:text-purple-700 transition-colors">의견 수렴</h2>
+                    <p class="text-slate-600 leading-relaxed">
+                        독도 수호와 홍보를 위한 국민 여러분의 소중한 제안과 아이디어를 자유롭게 남겨주세요.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center text-purple-600 font-semibold group-hover:text-purple-700">
+                    의견 남기기 
+                    <svg class="arrow-icon w-5 h-5 ml-2 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+                </div>
+            </a>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-auto py-10">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="mb-4">
+                <span class="text-2xl">🇰🇷</span>
+            </div>
+            <p class="text-slate-800 font-medium mb-2">대한민국 독도 지식 아카이브</p>
+            <p class="text-slate-500 text-sm">© 2024 Dokdo Knowledge Archive. All rights reserved.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
